@@ -54,7 +54,7 @@ def visualize_network(N, node_labels, node_groups, edges):
     print("Drawing figure...")
     fig = go.Figure(data=data, layout=layout)
     print("Saving plot...")
-    plot(fig, filename='BibleReferences')
+    plot(fig, filename='BibleReferencesVisualization')
 
 
 def main():
