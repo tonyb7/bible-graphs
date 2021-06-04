@@ -73,8 +73,8 @@ class BibleGraph:
         bibleGraph = cls()
         for versePair in weights.keys():
             verses = list(versePair)
-            if len(verses) < 2:
-                print("WARNING: Found weights key with len less than 2: ", verses)
+            if len(verses) != 2:
+                print("WARNING: Found weights key with len != 2: ", verses)
                 continue
             bibleGraph.add_edge(verses[0], verses[1])
         return bibleGraph
