@@ -5,6 +5,8 @@ from typing import NamedTuple
 
 # expression to capture a Bible reference that corresponds to a range of verses
 RANGE_REGEX: re.Pattern = re.compile("^(.*?)(?:-([^-]*))?$")
+# how many verses to plot. Set to float('inf') to plot everything
+VERSE_LIMIT = 100
 
 
 class BibleVerse(NamedTuple):
@@ -67,6 +69,7 @@ class BibleGraph:
         self.lowest_unused_index = 0
         self.verses_to_index: dict[BibleVerse, int] = {}
         self.index_to_verses: list[BibleVerse] = []
+        self.index_to_book: list[str] = []
         self.references = []
 
     @classmethod 
@@ -90,6 +93,7 @@ class BibleGraph:
             self.lowest_unused_index += 1
             self.verses_to_index[verse] = index 
             self.index_to_verses.append(verse)
+            self.index_to_book.append(verse.book)
         return index
 
 
@@ -103,7 +107,10 @@ def load_source_file(location: str) -> dict[VersePair, int]:
         header = next(file)
         whitespace = re.compile(r"\s")
         weights: dict[VersePair, int] = {}
-        for line in map(str.strip, file):
+        for i, line in enumerate(map(str.strip, file)):
+            if i >= VERSE_LIMIT:
+                break
+
             components = whitespace.split(line)
             if len(components) == 3:
                 raw_from, raw_tos, raw_weight = components

@@ -7,18 +7,10 @@ from graph_parser import load_source_file, BibleGraph
 import igraph as ig
 
 import chart_studio.plotly as py
-from plotly.offline import iplot
+from plotly.offline import plot
 import plotly.graph_objs as go
 
-def visualize_network():
-    weights = load_source_file("cross_references.txt")
-    bibleGraph = BibleGraph.from_weights(weights)
-    
-    N = bibleGraph.lowest_unused_index
-    node_labels = bibleGraph.index_to_verses
-
-    L = len(bibleGraph.references)
-    edges = bibleGraph.references
+def visualize_network(N, node_labels, node_groups, edges):
     print("Creating graph...")
     G = ig.Graph(edges, directed=False)
 
@@ -43,7 +35,7 @@ def visualize_network():
     trace_edges = go.Scatter3d(x=Xe, y=Ye, z=Ze, mode='lines', line=dict(color='rgb(125,125,125)', width=1),hoverinfo='none')
     print("Tracing nodes...")
     trace_nodes = go.Scatter3d(x=Xn, y=Yn, z=Zn, mode='markers', name='actors', 
-                   marker=dict(symbol='circle', size=6, colorscale='Viridis', 
+                   marker=dict(symbol='circle', size=6, colorscale='Viridis', color=node_groups,
                       line=dict(color='rgb(50,50,50)', width=0.5)), text=node_labels, hoverinfo='text')
     axis = dict(showbackground=False, showline=False, zeroline=False, showgrid=False, showticklabels=False, title='')
     print("Setting up layout...")
@@ -62,10 +54,22 @@ def visualize_network():
     print("Drawing figure...")
     fig = go.Figure(data=data, layout=layout)
     print("Saving plot...")
-    iplot(fig, filename='BibleReferences')
+    plot(fig, filename='BibleReferences')
 
+
+def main():
+    weights = load_source_file("cross_references.txt")
+    bibleGraph = BibleGraph.from_weights(weights)
+    
+    N = bibleGraph.lowest_unused_index
+    node_labels = bibleGraph.index_to_verses
+    d = {book: i for i, book in enumerate(set(bibleGraph.index_to_book))}
+    node_groups = [d[ni] for ni in bibleGraph.index_to_book]
+
+    edges = bibleGraph.references
+    visualize_network(N, node_labels, node_groups, edges)
 
 
 if __name__ == '__main__':
-    visualize_network()
+    main()
 
