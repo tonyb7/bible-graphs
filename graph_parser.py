@@ -64,7 +64,7 @@ VersePair = frozenset[BibleVerse]
 class BibleGraph:
     """Numerically stores bible verses as nodes and references as edges."""
     def __init__(self):
-        self._lowest_unused_index = 0
+        self.lowest_unused_index = 0
         self.verses_to_index: dict[BibleVerse, int] = {}
         self.index_to_verses: list[BibleVerse] = []
         self.references = []
@@ -86,8 +86,8 @@ class BibleGraph:
     def _verse_to_index(self, verse):
         index = self.verses_to_index.get(verse)
         if index is None:
-            index = self._lowest_unused_index 
-            self._lowest_unused_index += 1
+            index = self.lowest_unused_index 
+            self.lowest_unused_index += 1
             self.verses_to_index[verse] = index 
             self.index_to_verses.append(verse)
         return index
@@ -128,6 +128,6 @@ if __name__ == "__main__":
     weights = load_source_file("cross_references.txt")
     bibleGraph = BibleGraph.from_weights(weights)
 
-    print("Number of unique verses in biblegraph: ", bibleGraph._lowest_unused_index)
+    print("Number of unique verses in biblegraph: ", bibleGraph.lowest_unused_index)
     print("Edge samples: ", bibleGraph.references[:10])
     print("Node dict: ", list(bibleGraph.verses)[:10])
