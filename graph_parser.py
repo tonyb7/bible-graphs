@@ -61,6 +61,36 @@ class BibleVerse(NamedTuple):
 VersePair = frozenset[BibleVerse]
 
 
+class BibleGraph:
+    """Numerically stores bible verses as nodes and references as edges."""
+    def __init__(self):
+        self._lowest_unused_index = 0
+        self.verses: dict[BibleVerse, int] = {}
+        self.references = []
+
+    @classmethod 
+    def from_weights(cls, weights: dict[VersePair, int]):
+        bibleGraph = cls()
+        for versePair in weights.keys():
+            verses = list(versePair)
+            if len(verses) < 2:
+                print("WARNING: Found weights key with len less than 2: ", verses)
+                continue
+            bibleGraph.add_edge(verses[0], verses[1])
+        return bibleGraph
+    
+    def add_edge(self, from_verse, to_verse):
+        self.references.append((self._verse_to_index(from_verse), self._verse_to_index(to_verse)))
+    
+    def _verse_to_index(self, verse):
+        index = self.verses.get(verse)
+        if index is None:
+            index = self._lowest_unused_index 
+            self._lowest_unused_index += 1
+            self.verses[verse] = index 
+        return index
+
+
 def load_source_file(location: str) -> dict[VersePair, int]:
     """Load the dataset and return a dictionary that maps a pair of Bible verses to an integer
     corresponding to the edge weight. Note that verse pairs should be frozensets because edges
@@ -93,4 +123,9 @@ def load_source_file(location: str) -> dict[VersePair, int]:
 
 
 if __name__ == "__main__":
-    load_source_file("cross_references.txt")
+    weights = load_source_file("cross_references.txt")
+    bibleGraph = BibleGraph.from_weights(weights)
+
+    print("Number of unique verses in biblegraph: ", bibleGraph._lowest_unused_index)
+    print("Edge samples: ", bibleGraph.references[:10])
+    print("Node dict: ", list(bibleGraph.verses)[:10])
