@@ -65,7 +65,8 @@ class BibleGraph:
     """Numerically stores bible verses as nodes and references as edges."""
     def __init__(self):
         self._lowest_unused_index = 0
-        self.verses: dict[BibleVerse, int] = {}
+        self.verses_to_index: dict[BibleVerse, int] = {}
+        self.index_to_verses: list[BibleVerse] = []
         self.references = []
 
     @classmethod 
@@ -83,11 +84,12 @@ class BibleGraph:
         self.references.append((self._verse_to_index(from_verse), self._verse_to_index(to_verse)))
     
     def _verse_to_index(self, verse):
-        index = self.verses.get(verse)
+        index = self.verses_to_index.get(verse)
         if index is None:
             index = self._lowest_unused_index 
             self._lowest_unused_index += 1
-            self.verses[verse] = index 
+            self.verses_to_index[verse] = index 
+            self.index_to_verses.append(verse)
         return index
 
 
